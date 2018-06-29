@@ -1,57 +1,80 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <grid :items="gridData" :columns="gridCols"></grid>
   </div>
 </template>
 
 <script>
+import grid from "./grid";
 export default {
-  name: 'HelloWorld',
+  name: "HelloWorld",
+  components: {
+    grid
+  },
   props: {
     msg: String
+  },
+  data() {
+    return {
+      gridData: [
+        {
+          date: "1998-09-04T00:00:00.000Z",
+          company: "Google",
+          founders: "Larry Page, Sergey Brin",
+          website: "<a href='www.google.com'>www.google.com</a>"
+        },
+        {
+          date: "1976-04-01T00:00:00.000Z",
+          company: "Apple",
+          founders: "Steve Jobs, Steve Wozniak, Ronald Wayne",
+          website: "<a href='www.aple.com'>www.aple.com</a>"
+        },
+        {
+          date: "1975-04-04T00:00:00.000Z",
+          company: "Microsoft",
+          founders: "Bill Gates, Paul Allen",
+          website: "<a href='www.microsoft.com'>www.microsoft.com</a>"
+        },
+        {
+          date: "1994-07-05T00:00:00.000Z",
+          company: "Amazon",
+          founders: "Jeff Bezos",
+          website: "<a href='www.amazon.com'>www.amazon.com</a>"
+        }
+      ],
+      gridCols: [
+        {
+          prop: "date",
+          title: "Date",
+          type: "date",
+          sortable: true,
+          textAlign: "center"
+        },
+        {
+          prop: "company",
+          title: "Company",
+          type: "string",
+          sortable: true
+        },
+        {
+          prop: "founders",
+          title: "Founders",
+          type: "string",
+          sortable: true,
+          textAlign: "left"
+        },
+        {
+          prop: "website",
+          title: "Website",
+          type: "html",
+          sortable: false,
+          textAlign: "right"
+        }
+      ]
+    };
   }
-}
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 </style>

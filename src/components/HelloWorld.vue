@@ -54,13 +54,15 @@ export default {
           prop: "company",
           title: "Company",
           type: "string",
-          sortable: true
+          sortable: true,
+          filterable: true,
         },
         {
           prop: "founders",
           title: "Founders",
           type: "string",
           sortable: true,
+          filterable: true,
           textAlign: "left"
         },
         {

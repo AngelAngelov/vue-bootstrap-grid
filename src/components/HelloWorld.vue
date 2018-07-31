@@ -6,10 +6,11 @@
 
 <script>
 import grid from "./grid";
+
 export default {
   name: "HelloWorld",
   components: {
-    grid
+    grid,
   },
   props: {
     msg: String

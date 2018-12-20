@@ -6,13 +6,14 @@ import {
 import {
   faSort,
   faSortUp,
-  faSortDown
+  faSortDown,
+  faFilter
 } from '@fortawesome/free-solid-svg-icons'
 import {
   FontAwesomeIcon
 } from '@fortawesome/vue-fontawesome'
 
-library.add([faSort, faSortUp, faSortDown])
+library.add([faSort, faSortUp, faSortDown, faFilter])
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.config.productionTip = false

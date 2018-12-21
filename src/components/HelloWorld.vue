@@ -1,7 +1,12 @@
 /* eslint-disable */
 <template>
-  <div class="hello col-md-12">
-    <grid :items="gridData" :columns="gridCols" :paging="true" :pageSize="4" @rowClick="onRowClick"></grid>
+  <div>
+    <!-- <div class="col-md-12">
+      <grid :items="gridData" :columns="gridCols" :paging="true" :pageSize="2" @rowClick="onRowClick"></grid>
+    </div>-->
+    <div class="col-md-12">
+      <grid :useRemote="true" :baseUrl="url" :columns="grid2Cols" :paging="false" :pageSize="10" @rowClick="onRowClick"></grid>
+    </div>
   </div>
 </template>
 
@@ -10,7 +15,7 @@ import grid from './grid';
 export default {
   name: 'HelloWorld',
   components: {
-    grid,
+    grid
   },
   props: {
     msg: String
@@ -51,7 +56,7 @@ export default {
           date: '2003-07-01T00:00:00.000Z',
           company: 'Tesla',
           founders:
-            'Martin Eberhard, Marc Tarpenning, Elon Musk, J. B. Straubel, Ian Wright[',
+            'Martin Eberhard, Marc Tarpenning, Elon Musk, J. B. Straubel, Ian Wright',
           website: "<a href='www.tesla.com'>www.tesla.com</a>"
         },
         {
@@ -131,7 +136,41 @@ export default {
           textAlign: 'right',
           filterable: true
         }
-      ]
+      ],
+      grid2Cols: [
+        {
+          prop: 'id',
+          title: 'ID',
+          type: 'number',
+          sortable: true,
+          textAlign: 'left',
+          filterable: true
+        },
+        {
+          prop: 'userId',
+          title: 'User Id',
+          type: 'number',
+          sortable: true,
+          textAlign: 'left',
+          filterable: true
+        },
+        {
+          prop: 'title',
+          title: 'Title',
+          type: 'string',
+          sortable: true,
+          filterable: true
+        },
+        {
+          prop: 'body',
+          title: 'Post',
+          type: 'html',
+          sortable: true,
+          textAlign: 'left',
+          filterable: true
+        }
+      ],
+      url: 'https://jsonplaceholder.typicode.com/posts'
     };
   },
   methods: {

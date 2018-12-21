@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import axios from 'axios';
+import Row from './row';
 
 export default new Vue({
     data() {
@@ -11,7 +13,8 @@ export default new Vue({
             filters: [],
             sortKey: '',
             paging: false,
-            currentItemsCount: 0
+            currentItemsCount: 0,
+            baseUrl: ''
         }
     },
     methods: {
@@ -63,7 +66,24 @@ export default new Vue({
 
             return data;
         },
-        processData() {
+        _buildUrl() {
+            let url = this.baseUrl + '?';
+
+            if (this.sortKey) {
+                url += `sort=${this.sortKey}`;
+            }
+
+            if (this.filters.length) {
+                let filterStr = '';
+                this.filters.forEach((filter, index) => {
+                    var s = `${filter.col.prop}_${filter.operator}_${filter.value}`;
+                    filterStr += `&filter=${s}`;
+                });
+            }
+
+            return url;
+        },
+        _processLocalData() {
             const promise = new Promise((resolve, reject) => {
                 try {
                     if (this.items.length) {
@@ -89,8 +109,31 @@ export default new Vue({
 
             return promise;
         },
+        _processRemoteData() {
+            let url = this._buildUrl();
+            return axios.get(url)
+                .then(response => {
+                    let rows = [];
+                    this.currentItemsCount = response.data.length;
+                    response.data.forEach(item => rows.push(new Row(item)));
+                    this.data = rows;
+                })
+                .catch(err => console.error(err));
+        },
+        processData() {
+            if (this.baseUrl) {
+                return this._processRemoteData();
+            } else {
+                return this._processLocalData();
+            }
+        },
         setData(items) {
-            this.items = items;
+            if (items && !this.baseUrl) {
+                items.forEach((item, index) => {
+                    this.items.push(new Row(item, { selected: false }));
+                });
+            }
+
             return this.processData();
         },
         sort(sortKey) {

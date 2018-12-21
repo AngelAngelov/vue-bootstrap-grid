@@ -18,7 +18,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="pointer" v-for="(row, index) in dataSource.data" :key="index" @click="onRowClick(entry)" @dblclick="onDblClick(entry)">
+        <tr class="pointer" v-for="(row, index) in dataSource.data" :key="index" @click="onRowClick(row)">
           <td v-if="rowNumbers">{{index+1}}</td>
           <td v-for="(key, index) in columns" :key="index" v-bind:class="['text-' + key.textAlign]">
             <span v-if="key.type === 'date'">{{row.items[key.prop] | date}}</span>
@@ -53,7 +53,8 @@ export default {
     rowNumbers: { type: Boolean, default: false },
     paging: { type: Boolean, default: false },
     pageSize: { type: Number, default: 10 },
-    url: String
+    baseUrl: String,
+    useRemote: { type: Boolean, default: false }
   },
   data: function() {
     return {
@@ -74,24 +75,27 @@ export default {
   methods: {
     sortBy(key) {
       this.sortKey = key;
-      this.dataSource.sort(key)
-                     .then((err) => this.$refs.pager.goToPage(1))
-                     .catch(err => console.error(err));
+      this.dataSource
+        .sort(key)
+        .then(err => this.$refs.pager.goToPage(1))
+        .catch(err => console.error(err));
     },
     onRowClick(row) {
       this.$emit('rowClick', row);
     },
     applyFilter(filterData) {
       console.log('apply filter to grid', filterData);
-      this.dataSource.filter(filterData)
-                     .then((err) => this.$refs.pager.goToPage(1))
-                     .catch(err => console.error(err));
+      this.dataSource
+        .filter(filterData)
+        .then(err => this.$refs.pager.goToPage(1))
+        .catch(err => console.error(err));
     },
     clearFilter(col) {
       console.log('clear filter in grid', col);
-      this.dataSource.removeFilter(col)
-                     .the(() => this.$refs.pager.goToPage(1))
-                     .catch(err => console.error(err));
+      this.dataSource
+        .removeFilter(col)
+        .the(() => this.$refs.pager.goToPage(1))
+        .catch(err => console.error(err));
     },
     onPageChange(pageNumber) {
       console.log('page change ', pageNumber);
@@ -99,13 +103,16 @@ export default {
     }
   },
   watch: {
-      'dataSource.currentItemsCount': function (newVal, oldVal) {
-          console.log('grid data length changed', newVal);    
-          this.totalPages = Math.ceil(newVal / this.pageSize);
-      }
+    'dataSource.currentItemsCount': function(newVal, oldVal) {
+      this.totalPages = Math.ceil(newVal / this.pageSize);
+    }
   },
   mounted: function() {
     this.dataSource = DataSource;
+
+    if (this.useRemote) {
+      this.dataSource.baseUrl = this.baseUrl;
+    }
 
     if (this.paging) {
       this.totalPages = Math.ceil(this.items.length / this.pageSize);
@@ -118,12 +125,11 @@ export default {
       this.dataSource.sortOrders[item.prop] = 1;
     });
 
-    let rows = [];
-    this.items.forEach((item, index) => {
-      rows.push(new Row(item, { selected: false }));
-    });
-
-    this.dataSource.setData(rows);
+    if (this.useRemote) {
+      this.dataSource.setData(null);
+    } else {
+      this.dataSource.setData(this.items);
+    }
   }
 };
 </script>

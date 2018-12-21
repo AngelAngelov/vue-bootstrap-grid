@@ -76,7 +76,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 .popper-btn {
   padding: 0;

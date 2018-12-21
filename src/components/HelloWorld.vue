@@ -1,7 +1,7 @@
 /* eslint-disable */
 <template>
   <div class="hello col-md-12">
-    <grid :items="gridData" :columns="gridCols" :paging="true" :pageSize="3" @rowClick="onRowClick"></grid>
+    <grid :items="gridData" :columns="gridCols" :paging="true" :pageSize="4" @rowClick="onRowClick"></grid>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ import grid from './grid';
 export default {
   name: 'HelloWorld',
   components: {
-    grid
+    grid,
   },
   props: {
     msg: String

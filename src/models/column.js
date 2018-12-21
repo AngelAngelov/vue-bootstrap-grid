@@ -4,15 +4,21 @@ class Column {
         this.title = props.title || '';
         this.type = props.type || this.defaults.type;
         this.sortable = props.sortable || this.defaults.sortable;
+        this.filterable = props.filterable || this.defaults.filterable;
         this.textAlign = props.textAlign || this.defaults.textAlign;
-        this.filterable = props.filterable || this.defaults.filterable
+        this.dateTimeFormat = props.dateTimeFormat || this.defaults.dateTimeFormat;
+        this.cellClass = props.cellClass || this.defaults.cellClass;
+        this.titleClass = props.titleClass || this.defaults.titleClass;
     }
 
     defaults = {
-        textAlign: 'center',
-        sortable: false,
         type: 'text',
-        filterable: false
+        sortable: false,
+        filterable: false,
+        textAlign: 'center',
+        dateTimeFormat: 'DD.MM.YYYY HH:mm',
+        cellClass: '',
+        titleClass: ''
     }
 }
 

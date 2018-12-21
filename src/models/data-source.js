@@ -10,7 +10,8 @@ export default new Vue({
             currentPage: 1,
             filters: [],
             sortKey: '',
-            paging: false
+            paging: false,
+            currentItemsCount: 0
         }
     },
     methods: {
@@ -53,7 +54,7 @@ export default new Vue({
             if (this.sortKey) {
                 let order = this.sortOrders[this.sortKey] || 1;
 
-                data = data.slice().sort(function (row1, row2) {
+                data = data.slice().sort((row1, row2) => {
                     row1 = row1.items[this.sortKey];
                     row2 = row2.items[this.sortKey];
                     return (row1 === row2 ? 0 : row1 > row2 ? 1 : -1) * order;
@@ -62,33 +63,41 @@ export default new Vue({
 
             return data;
         },
+        processData() {
+            const promise = new Promise((resolve, reject) => {
+                try {
+                    if (this.items.length) {
+                        let data = [...this.items];
+
+                        data = this._filterData(data);
+                        data = this._sortData(data);
+                        this.currentItemsCount = data.length;
+
+                        if (this.paging) {
+                            const startIndex = (this.currentPage - 1) * this.pageSize;
+                            data = data.splice(startIndex, this.pageSize);
+                        }
+
+                        this.data = data;
+                    }
+
+                    resolve();
+                } catch (error) {
+                    reject(err)
+                }
+            });
+
+            return promise;
+        },
         setData(items) {
             this.items = items;
-            this.processData();
-        },
-        processData() {
-            if (!this.items.length) {
-                return;
-            }
-
-            let data = [...this.items];
-
-            data = this._filterData(data);
-            data = this._sortData(data);
-
-            if (this.paging) {
-                const startIndex = (this.currentPage - 1) * this.pageSize;
-                data = data.splice(startIndex, this.pageSize);
-            }
-
-            return this.data = data;
+            return this.processData();
         },
         sort(sortKey) {
-            if (sortKey) {
-                this.sortKey = sortKey;
-                this.sortOrders[sortKey] = this.sortOrders[sortKey] * -1;
-                this.processData();
-            }
+            this.sortKey = sortKey;
+            this.sortOrders[sortKey] = this.sortOrders[sortKey] * -1;
+            this.currentPage = 1;
+            return this.processData();
         },
         filter(filter) {
             let currentIndex = this.filters.findIndex((fl) => {
@@ -101,21 +110,31 @@ export default new Vue({
                 this.filters.push(filter);
             }
 
-            this.processData();
+            this.currentPage = 1;
+            return this.processData();
         },
         page(number) {
             this.currentPage = number;
-            this.processData();
+            return this.processData();
         },
         removeFilter(col) {
-            const index = this.filters.findIndex((item) => {
-                return item.col.prop === col.prop
-            });
+            let promise = new Promise((resolve, reject) => {
+                const index = this.filters.findIndex((item) => {
+                    return item.col.prop === col.prop
+                });
 
-            if (index != -1) {
+                if (index == -1) {
+                    resolve();
+                }
+
+                this.currentPage = 1;
                 this.filters.splice(index, 1);
-                this.processData();
-            }
+                this.processData()
+                    .then(() => resolve())
+                    .catch((err) => reject(err));
+            })
+
+            return promise;
         }
     }
 });

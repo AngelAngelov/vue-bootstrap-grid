@@ -28,7 +28,7 @@
         </tr>
       </tbody>
     </table>
-    <pager :total-pages="totalPages" :initial-page="currentPage" @change="onPageChange"></pager>
+    <pager :total-pages="totalPages" :initial-page="currentPage" @change="onPageChange" ref="pager"></pager>
   </div>
 </template>
 
@@ -63,7 +63,8 @@ export default {
       rows: [],
       currentPage: 1,
       totalPages: null,
-      dataSource: DataSource
+      dataSource: DataSource,
+      totalPages: 0
     };
   },
   computed: {},
@@ -73,23 +74,35 @@ export default {
   methods: {
     sortBy(key) {
       this.sortKey = key;
-      this.dataSource.sort(key);
+      this.dataSource.sort(key)
+                     .then((err) => this.$refs.pager.goToPage(1))
+                     .catch(err => console.error(err));
     },
     onRowClick(row) {
       this.$emit('rowClick', row);
     },
     applyFilter(filterData) {
       console.log('apply filter to grid', filterData);
-      this.dataSource.filter(filterData);
+      this.dataSource.filter(filterData)
+                     .then((err) => this.$refs.pager.goToPage(1))
+                     .catch(err => console.error(err));
     },
     clearFilter(col) {
       console.log('clear filter in grid', col);
-      this.dataSource.removeFilter(col);
+      this.dataSource.removeFilter(col)
+                     .the(() => this.$refs.pager.goToPage(1))
+                     .catch(err => console.error(err));
     },
     onPageChange(pageNumber) {
       console.log('page change ', pageNumber);
       this.dataSource.page(pageNumber);
     }
+  },
+  watch: {
+      'dataSource.currentItemsCount': function (newVal, oldVal) {
+          console.log('grid data length changed', newVal);    
+          this.totalPages = Math.ceil(newVal / this.pageSize);
+      }
   },
   mounted: function() {
     this.dataSource = DataSource;
@@ -99,16 +112,18 @@ export default {
       this.dataSource.paging = true;
       this.dataSource.pageSize = this.pageSize;
     }
+
     this.columns.forEach(item => {
       this.cols.push(new Column(item));
       this.dataSource.sortOrders[item.prop] = 1;
     });
 
+    let rows = [];
     this.items.forEach((item, index) => {
-      this.rows.push(new Row(item, { selected: false }));
+      rows.push(new Row(item, { selected: false }));
     });
 
-    this.dataSource.setData(this.rows);
+    this.dataSource.setData(rows);
   }
 };
 </script>
@@ -122,7 +137,15 @@ th.active a {
   color: #007bff; /* bootstrap theme link color */
 }
 
+a.active {
+  color: #007bff; /* bootstrap theme link color */
+}
+
 .pointer {
   cursor: pointer;
+}
+
+.filter-icon {
+  float: right;
 }
 </style>

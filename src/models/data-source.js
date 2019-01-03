@@ -66,19 +66,30 @@ export default new Vue({
 
             return data;
         },
-        _buildUrl() {
-            let url = this.baseUrl + '?';
+        _buildQueryString() {
+            let url = '';
 
             if (this.sortKey) {
-                url += `sort=${this.sortKey}`;
+                let order = this.sortOrders[this.sortKey] || 1;
+                url += `grid_sort=${this.sortKey}&grid_sort_order=${order}`;
             }
 
             if (this.filters.length) {
                 let filterStr = '';
                 this.filters.forEach((filter, index) => {
-                    var s = `${filter.col.prop}_${filter.operator}_${filter.value}`;
-                    filterStr += `&filter=${s}`;
+                    var str = `${filter.col.prop}_${filter.operator}_${filter.value}_${filter.col.type}`;
+                    filterStr += `&grid_filter=${str}`;
                 });
+
+                url += filterStr;
+            }
+
+            if (this.paging) {
+                url += `&grid_page=${this.currentPage}&grid_page_size=${this.pageSize}`
+            }
+
+            if (url.length && url[0] === '&') {
+                url = url.substring(1);
             }
 
             return url;
@@ -110,12 +121,14 @@ export default new Vue({
             return promise;
         },
         _processRemoteData() {
-            let url = this._buildUrl();
+            const queryString = this._buildQueryString();
+            let url = this.baseUrl + '?' + queryString;
+            window.history.pushState(null, null, location.href.split('?')[0] + '?' + queryString);
             return axios.get(url)
                 .then(response => {
                     let rows = [];
-                    this.currentItemsCount = response.data.length;
-                    response.data.forEach(item => rows.push(new Row(item)));
+                    this.currentItemsCount = response.data.totalItems;
+                    response.data.items.forEach(item => rows.push(new Row(item)));
                     this.data = rows;
                 })
                 .catch(err => console.error(err));
@@ -142,7 +155,7 @@ export default new Vue({
             this.currentPage = 1;
             return this.processData();
         },
-        filter(filter) {
+        applyFilter(filter) {
             let currentIndex = this.filters.findIndex((fl) => {
                 return fl.col.prop === filter.col.prop;
             });
@@ -156,7 +169,7 @@ export default new Vue({
             this.currentPage = 1;
             return this.processData();
         },
-        page(number) {
+        setPage(number) {
             this.currentPage = number;
             return this.processData();
         },

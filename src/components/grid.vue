@@ -28,7 +28,7 @@
         </tr>
       </tbody>
     </table>
-    <pager :total-pages="totalPages" :initial-page="currentPage" @change="onPageChange" ref="pager"></pager>
+    <pager v-if="paging" :total-pages="totalPages" :initial-page="currentPage" @change="onPageChange" ref="pager"></pager>
   </div>
 </template>
 
@@ -39,6 +39,20 @@ import customFilters from '../models/filters';
 import Filter from './filter.vue';
 import Pager from './pager.vue';
 import DataSource from '../models/data-source';
+
+import Vue from 'vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faSort,
+  faSortUp,
+  faSortDown,
+  faFilter
+} from '@fortawesome/free-solid-svg-icons';
+
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+library.add([faSort, faSortUp, faSortDown, faFilter]);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 export default {
   name: 'grid',
@@ -86,7 +100,7 @@ export default {
     applyFilter(filterData) {
       console.log('apply filter to grid', filterData);
       this.dataSource
-        .filter(filterData)
+        .applyFilter(filterData)
         .then(err => this.$refs.pager.goToPage(1))
         .catch(err => console.error(err));
     },
@@ -94,12 +108,12 @@ export default {
       console.log('clear filter in grid', col);
       this.dataSource
         .removeFilter(col)
-        .the(() => this.$refs.pager.goToPage(1))
+        .then(() => this.$refs.pager.goToPage(1))
         .catch(err => console.error(err));
     },
     onPageChange(pageNumber) {
       console.log('page change ', pageNumber);
-      this.dataSource.page(pageNumber);
+      this.dataSource.setPage(pageNumber);
     }
   },
   watch: {
@@ -110,14 +124,22 @@ export default {
   mounted: function() {
     this.dataSource = DataSource;
 
+    let queryString = location.href.split('?')[1];
+
+    if (queryString) {
+    }
+
     if (this.useRemote) {
       this.dataSource.baseUrl = this.baseUrl;
     }
 
     if (this.paging) {
-      this.totalPages = Math.ceil(this.items.length / this.pageSize);
       this.dataSource.paging = true;
       this.dataSource.pageSize = this.pageSize;
+
+      if (!this.useRemote) {
+        this.totalPages = Math.ceil(this.items.length / this.pageSize);
+      }
     }
 
     this.columns.forEach(item => {

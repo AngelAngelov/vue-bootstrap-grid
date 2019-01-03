@@ -2,10 +2,10 @@
 <template>
   <div>
     <!-- <div class="col-md-12">
-      <grid :items="gridData" :columns="gridCols" :paging="true" :pageSize="2" @rowClick="onRowClick"></grid>
+      <grid :items="gridData" :columns="gridCols" :paging="true" :pageSize="5" @rowClick="onRowClick"></grid>
     </div>-->
     <div class="col-md-12">
-      <grid :useRemote="true" :baseUrl="url" :columns="grid2Cols" :paging="false" :pageSize="10" @rowClick="onRowClick"></grid>
+      <grid :useRemote="true" :baseUrl="url" :columns="grid2Cols" :paging="true" :pageSize="10" @rowClick="onRowClick"></grid>
     </div>
   </div>
 </template>
@@ -170,7 +170,7 @@ export default {
           filterable: true
         }
       ],
-      url: 'https://jsonplaceholder.typicode.com/posts'
+      url: 'http://localhost:3000/posts'
     };
   },
   methods: {

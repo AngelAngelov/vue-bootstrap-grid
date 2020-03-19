@@ -1,11 +1,10 @@
-/* eslint-disable */
 <template>
 	<div>
 		<!-- <div class="col-md-12">
 			<grid :items="gridData" :columns="gridCols" :paging="true" :pageSize="5" @rowClick="onRowClick"></grid>
 		</div>-->
 		<div class="col-md-12">
-			<grid :useRemote="true" :baseUrl="url" :columns="grid2Cols" :paging="true" :pageSize="10" @rowClick="onRowClick" :items="gridData"></grid>
+			<grid :useRemote="false" :baseUrl="url" :columns="gridCols" :paging="true" :pageSize="4" @rowClick="onRowClick" :items="gridData"></grid>
 		</div>
 	</div>
 </template>

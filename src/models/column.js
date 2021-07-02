@@ -9,6 +9,8 @@ class Column {
         this.dateTimeFormat = props.dateTimeFormat || this.defaults.dateTimeFormat;
         this.cellClass = props.cellClass || this.defaults.cellClass;
         this.titleClass = props.titleClass || this.defaults.titleClass;
+        this.template = props.template || undefined;
+
     }
 
     defaults = {

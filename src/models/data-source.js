@@ -7,11 +7,11 @@ export default new Vue({
         return {
             items: [],
             data: [],
-            sortOrders: {},
             pageSize: 2,
             currentPage: 1,
             filters: [],
             sortKey: '',
+            sortDirection: null,
             paging: false,
             currentItemsCount: 0,
             baseUrl: ''
@@ -55,7 +55,7 @@ export default new Vue({
         },
         _sortData(data) {
             if (this.sortKey) {
-                let order = this.sortOrders[this.sortKey] || 1;
+                let order = this.sortDirection || 1;
 
                 data = data.slice().sort((row1, row2) => {
                     row1 = row1.items[this.sortKey];
@@ -70,13 +70,13 @@ export default new Vue({
             let url = '';
 
             if (this.sortKey) {
-                let order = this.sortOrders[this.sortKey] || 1;
+                let order = this.sortDirection || 1;
                 url += `grid_sort=${this.sortKey}&grid_sort_order=${order}`;
             }
 
             if (this.filters.length) {
                 let filterStr = '';
-                this.filters.forEach((filter, index) => {
+                this.filters.forEach((filter) => {
                     var str = `${filter.col.prop}_${filter.operator}_${filter.value}_${filter.col.type}`;
                     filterStr += `&grid_filter=${str}`;
                 });
@@ -114,7 +114,7 @@ export default new Vue({
 
                     resolve();
                 } catch (error) {
-                    reject(err)
+                    reject(error)
                 }
             });
 
@@ -142,16 +142,16 @@ export default new Vue({
         },
         setData(items) {
             if (items && !this.baseUrl) {
-                items.forEach((item, index) => {
+                items.forEach((item) => {
                     this.items.push(new Row(item, { selected: false }));
                 });
             }
 
             return this.processData();
         },
-        sort(sortKey) {
+        sort(sortKey, direction) {
             this.sortKey = sortKey;
-            this.sortOrders[sortKey] = this.sortOrders[sortKey] * -1;
+            this.sortDirection = direction;
             this.currentPage = 1;
             return this.processData();
         },
